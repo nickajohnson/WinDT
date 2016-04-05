@@ -23,6 +23,7 @@ namespace NJ.RPI.Hardware
             PowerDownAndSerialClockInput = powerDownAndSerialClockInput;
             powerDownAndSerialClockInput.SetDriveMode(GpioPinDriveMode.Output);
 
+
             SerialDataOutput = serialDataOutput;
             SerialDataOutput.SetDriveMode(GpioPinDriveMode.Input);
         }
@@ -47,22 +48,23 @@ namespace NJ.RPI.Hardware
             Debug.WriteLine("HX711.Read() Starting....");
             while (!IsReady())
             {
-                Debug.WriteLine("Inside not ready loop");
+                
             }
             int data = 0;
+            int bitsToRead = 24;
 
-            for (int pulses = 0; pulses < 24; pulses++)
+            for (int pulses = 0; pulses < bitsToRead; pulses++)
             {
 
                 PowerDownAndSerialClockInput.Write(GpioPinValue.High);
                 int bit = (int)SerialDataOutput.Read();
                 //Debug.WriteLine(string.Format("Pulses = {0},  Bit={1}, Data={2}", pulses, bit, data));
-                data = (data << pulses) & bit;
+                data = (bit << (bitsToRead - pulses)) ^ data;
                 PowerDownAndSerialClockInput.Write(GpioPinValue.Low);
 
             }
 
-            Debug.WriteLine(String.Format("Loop complete, data = {0}", data));
+            
 
             for (int i = 0; i < (int)_InputAndGainSelection; i++)
             {
@@ -70,7 +72,10 @@ namespace NJ.RPI.Hardware
                 PowerDownAndSerialClockInput.Write(GpioPinValue.Low);
             }
 
-            return ~data;
+            data = (data ^ 0xFFFFFF) + 1;
+
+            Debug.WriteLine(String.Format("Loop complete, data = {0}", data));
+            return data; 
 
         }
 

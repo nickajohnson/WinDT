@@ -91,7 +91,7 @@ namespace NJ.RPI.Hardware
 
             int timeBetweenTicks = ((int)1000 / _refreshFrequency);
 
-            // _refreshLoadCellValueTimer = new Timer(updateTimer_Tick, null, 0, timeBetweenTicks);
+            _refreshLoadCellValueTimer = new Timer(updateTimer_Tick, null, 0, timeBetweenTicks);
         }
 
 

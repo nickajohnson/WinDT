@@ -34,23 +34,23 @@ namespace WinDTConsole
             airspeedPressureInput = pressureADC.AddInput(ADCDifferentialInput.Ch2NegCh3Pos, "Airspeed Pressure Sensor");
             airspeedPressureInput.RaiseDataChangedEvent += AirspeedPressureInput_RaiseInputChangedEvent;
 
-            //gpioController = GpioController.GetDefault();
-            //GpioOpenStatus status;
+            gpioController = GpioController.GetDefault();
+            GpioOpenStatus status;
 
-            //if (gpioController != null
-            //    && gpioController.TryOpenPin(_loadCellClockPinNumber, GpioSharingMode.Exclusive, out _liftSensorCLockGPIOPin, out status)
-            //    && gpioController.TryOpenPin(_loadCellDataPinNUmber, GpioSharingMode.Exclusive, out _liftSensorDataGPIOPin, out status))
-            //{
-            //    liftSensor = new WindTunnelLiftSensor(_liftSensorCLockGPIOPin, _liftSensorDataGPIOPin);
-            //    liftSensor.RaiseLIftingForceChangedEvent += LiftSensor_RaiseLIftingForceChangedEvent;
-            //}
-            //else
-            //{
-            //    var task = this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            //    {
-            //        LiftingForceData.Text = "Unable to init load cell";
-            //    });
-            //}
+            if (gpioController != null
+                && gpioController.TryOpenPin(_loadCellClockPinNumber, GpioSharingMode.Exclusive, out _liftSensorCLockGPIOPin, out status)
+                && gpioController.TryOpenPin(_loadCellDataPinNUmber, GpioSharingMode.Exclusive, out _liftSensorDataGPIOPin, out status))
+            {
+                liftSensor = new WindTunnelLiftSensor(_liftSensorCLockGPIOPin, _liftSensorDataGPIOPin);
+                liftSensor.RaiseLIftingForceChangedEvent += LiftSensor_RaiseLIftingForceChangedEvent;
+            }
+            else
+            {
+                var task = this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                    LiftingForceData.Text = "Unable to init load cell";
+                });
+            }
 
             _updateSensorDataTimer = new Timer(updateSensorData_tick, null, 0, 500);
         }
